@@ -2,17 +2,18 @@ import cloudinary from "@/app/lib/cloudinary";
 import { connectDB } from "../../db/connectDB";
 import { Image } from "../../models/image.model";
 import { UploadImage } from "@/app/lib/upload-image";
+import { NextRequest } from "next/server";
 
 interface UploadResult {
   secure_url: string;
   public_id: string;
 }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, context: { params: { id: string } }) {
     await connectDB();
 
     try {
-        const image = await Image.findById(params.id);
+        const image = await Image.findById(context.params.id);
         
         if (!image) {
             return Response.json({ message: "Image not found" }, { status: 404 });
@@ -25,7 +26,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }
 }
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, context: { params: { id: string } }) {
     await connectDB();
 
     try {
@@ -36,25 +37,21 @@ export async function POST(request: Request, { params }: { params: { id: string 
             return Response.json({ message: "No valid image provided" }, { status: 400 });
         }
 
-        // Find the existing image in DB
-        const existingImage = await Image.findById(params.id);
+        const existingImage = await Image.findById(context.params.id);
 
         if (!existingImage) {
             return Response.json({ message: "Image not found in database" }, { status: 404 });
         }
 
-        // Delete previous image from Cloudinary
         await cloudinary.uploader.destroy(existingImage.public_id);
         console.log("Previous image deleted from Cloudinary");
 
-        // Upload the new image to Cloudinary
         const uploadResult = (await UploadImage(newImage, "fileupload")) as UploadResult;
 
         console.log("New image uploaded:", uploadResult);
 
-        // Update the image in MongoDB
         const updatedImage = await Image.findByIdAndUpdate(
-            params.id,
+            context.params.id,
             {
                 image_url: uploadResult.secure_url,
                 public_id: uploadResult.public_id
@@ -69,29 +66,24 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }
 }
 
-export async function DELETE(request: Request, {params}: {params: {id: string}}) {
+export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
     await connectDB();
 
     try {
-         // Find the existing image in DB
-         const existingImage = await Image.findById(params.id);
+        const existingImage = await Image.findById(context.params.id);
 
-         if (!existingImage) {
-             return Response.json({ message: "Image not found in database" }, { status: 404 });
-         }
+        if (!existingImage) {
+            return Response.json({ message: "Image not found in database" }, { status: 404 });
+        }
  
-         // Delete previous image from Cloudinary
-         await cloudinary.uploader.destroy(existingImage.public_id);
-         console.log("Image deleted from Cloudinary");
+        await cloudinary.uploader.destroy(existingImage.public_id);
+        console.log("Image deleted from Cloudinary");
 
-        //delete from MongoDB
-        const deletedImage = await Image.findByIdAndDelete(
-            params.id,
-        );
-        return Response.json({message: "Image deleted succesfully!", image: deletedImage})
+        const deletedImage = await Image.findByIdAndDelete(context.params.id);
+        return Response.json({ message: "Image deleted successfully!", image: deletedImage });
         
     } catch (error) {
         console.error("Error deleting image.", error);
-        return Response.json({message: "Error deleting image."})
+        return Response.json({ message: "Error deleting image." });
     }
 }

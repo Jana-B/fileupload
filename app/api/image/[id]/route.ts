@@ -10,11 +10,12 @@ interface UploadResult {
 }
 
 // Corrected GET function
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     await connectDB();
 
     try {
-        const image = await Image.findById(params.id);
+        const id = (await params).id;
+        const image = await Image.findById(id);
         
         if (!image) {
             return NextResponse.json({ message: "Image not found" }, { status: 404 });
@@ -28,8 +29,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // Corrected POST function
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise <{ id: string }> }) {
     await connectDB();
+    const id = (await params).id;
 
     try {
         const formData = await request.formData();
@@ -39,7 +41,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
             return NextResponse.json({ message: "No valid image provided" }, { status: 400 });
         }
 
-        const existingImage = await Image.findById(params.id);
+        const existingImage = await Image.findById(id);
 
         if (!existingImage) {
             return NextResponse.json({ message: "Image not found in database" }, { status: 404 });
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         console.log("New image uploaded:", uploadResult);
 
         const updatedImage = await Image.findByIdAndUpdate(
-            params.id,
+            id,
             {
                 image_url: uploadResult.secure_url,
                 public_id: uploadResult.public_id
@@ -69,11 +71,12 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 }
 
 // Corrected DELETE function
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise <{ id: string }> }) {
     await connectDB();
+    const id = (await params).id;
 
     try {
-        const existingImage = await Image.findById(params.id);
+        const existingImage = await Image.findById(id);
 
         if (!existingImage) {
             return NextResponse.json({ message: "Image not found in database" }, { status: 404 });
@@ -82,7 +85,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
         await cloudinary.uploader.destroy(existingImage.public_id);
         console.log("Image deleted from Cloudinary");
 
-        const deletedImage = await Image.findByIdAndDelete(params.id);
+        const deletedImage = await Image.findByIdAndDelete(id);
         return NextResponse.json({ message: "Image deleted successfully!", image: deletedImage }, { status: 200 });
         
     } catch (error) {

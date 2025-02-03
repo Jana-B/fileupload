@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { Loader2 } from "lucide-react"; // Loader icon for better UX
+import { Loader2 } from "lucide-react";
 
 const UpdateImage = () => {
   const params = useParams();
@@ -13,13 +13,15 @@ const UpdateImage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const apiURL = process.env.API_URL || "http://localhost:3000";
+
   // Fetch the existing image
   useEffect(() => {
     const fetchImage = async () => {
       try {
         const response = await fetch(
           // `http://localhost:3000/api/image/${params.id}`
-          `/api/image/${params.id}`
+          `${apiURL}/api/image/${params.id}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch image.");
@@ -65,7 +67,7 @@ const UpdateImage = () => {
 
       const response = await fetch(
         // `http://localhost:3000/api/image/${params.id}`,
-        `/api/image/${params.id}`,
+        `${apiURL}/api/image/${params.id}`,
         {
           method: "POST",
           body: formData,
@@ -103,7 +105,7 @@ const UpdateImage = () => {
     try {
       const response = await fetch(
         // `http://localhost:3000/api/image/${params.id}`,
-        `/api/image/${params.id}`,
+        `${apiURL}/api/image/${params.id}`,
         {
           method: "DELETE",
         }

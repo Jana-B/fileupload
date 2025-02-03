@@ -13,6 +13,7 @@ export default function Home() {
   const [image, setImage] = useState<File | null>(null);
   const [images, setImages] = useState<ImageType[]>([]);
   const router = useRouter();
+  // const apiURL = process.env.apiURL;
 
   useEffect(() => {
     fetch("/api/get-images")

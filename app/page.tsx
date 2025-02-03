@@ -13,7 +13,7 @@ export default function Home() {
   const [image, setImage] = useState<File | null>(null);
   const [images, setImages] = useState<ImageType[]>([]);
   const router = useRouter();
-  const apiURL = process.env.apiURL;
+  const apiURL = process.env.API_URL;
 
   useEffect(() => {
     fetch(`${apiURL}/api/get-images`)
@@ -52,7 +52,7 @@ export default function Home() {
 
       await response.json();
       alert("Image uploaded successfully!");
-      router.refresh();
+      router.refresh(); // Refresh page to show new image
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Failed to upload image!");

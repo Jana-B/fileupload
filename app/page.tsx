@@ -13,10 +13,10 @@ export default function Home() {
   const [image, setImage] = useState<File | null>(null);
   const [images, setImages] = useState<ImageType[]>([]);
   const router = useRouter();
-  // const apiURL = process.env.apiURL;
+  const apiURL = process.env.apiURL;
 
   useEffect(() => {
-    fetch("/api/get-images")
+    fetch(`${apiURL}/api/get-images`)
       .then((response) => {
         if (!response.ok) throw new Error("Response was not ok!");
         return response.json();
@@ -41,7 +41,7 @@ export default function Home() {
     formData.append("image", image);
 
     try {
-      const response = await fetch("/api/upload-image", {
+      const response = await fetch(`${apiURL}/api/upload-image`, {
         method: "POST",
         body: formData,
       });
@@ -52,7 +52,7 @@ export default function Home() {
 
       await response.json();
       alert("Image uploaded successfully!");
-      router.refresh(); // Refresh page to show new image
+      router.refresh();
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Failed to upload image!");

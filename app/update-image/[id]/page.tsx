@@ -13,7 +13,7 @@ const UpdateImage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const apiURL = process.env.API_URL || "http://localhost:3000";
+  const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
   // Fetch the existing image
   useEffect(() => {

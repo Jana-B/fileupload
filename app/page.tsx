@@ -15,7 +15,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/get-images")
+    fetch("/api/get-images")
       .then((response) => {
         if (!response.ok) throw new Error("Response was not ok!");
         return response.json();
@@ -40,7 +40,7 @@ export default function Home() {
     formData.append("image", image);
 
     try {
-      const response = await fetch("http://localhost:3000/api/upload-image", {
+      const response = await fetch("/api/upload-image", {
         method: "POST",
         body: formData,
       });

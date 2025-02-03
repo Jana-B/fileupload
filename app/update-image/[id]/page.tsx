@@ -18,7 +18,8 @@ const UpdateImage = () => {
     const fetchImage = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/image/${params.id}`
+          // `http://localhost:3000/api/image/${params.id}`
+          `/api/image/${params.id}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch image.");
@@ -63,7 +64,8 @@ const UpdateImage = () => {
       formData.append("image", selectedImage);
 
       const response = await fetch(
-        `http://localhost:3000/api/image/${params.id}`,
+        // `http://localhost:3000/api/image/${params.id}`,
+        `/api/image/${params.id}`,
         {
           method: "POST",
           body: formData,
@@ -100,7 +102,8 @@ const UpdateImage = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/image/${params.id}`,
+        // `http://localhost:3000/api/image/${params.id}`,
+        `/api/image/${params.id}`,
         {
           method: "DELETE",
         }
